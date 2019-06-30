@@ -1,3 +1,8 @@
+extern crate image;
+
+use dots::get_dots;
+
 fn main() {
-    println!("Hello, world!");
+    let path = "./a.jpeg";
+    println!("{}", get_dots(path.to_string()))
 }
