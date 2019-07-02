@@ -20,14 +20,11 @@
 
 extern crate image;
 
+use image::imageops::FilterType;
 use image::{GenericImageView, Rgba};
-use image::imageops::{FilterType};
-
-
 
 // grey scale threshold value for black white algorithm
 const GREY_SCALE_THRESHOLD: u8 = 200;
-
 
 //uses black and white algorithm
 pub fn get_output(image_path: String) -> String {
@@ -44,30 +41,35 @@ pub fn get_output(image_path: String) -> String {
     while pos_y < height - 5 {
         if pos_x >= width - 5 {
             pos_x = 0;
-            pos_y+=3;
+            pos_y += 3;
             output += "\n"
         }
 
         //take 4 adjacent pixels at a time
         let _0 = img.get_pixel(pos_x, pos_y);
-        let _1 = img.get_pixel(pos_x +1, pos_y);
-        let _2 = img.get_pixel(pos_x + 1, pos_y +1);
-        let _3 = img.get_pixel(pos_x + 1, pos_y +2);
-        let _4 = img.get_pixel(pos_x, pos_y +2);
-        let _5 = img.get_pixel(pos_x, pos_y +1);
-        
+        let _1 = img.get_pixel(pos_x + 1, pos_y);
+        let _2 = img.get_pixel(pos_x + 1, pos_y + 1);
+        let _3 = img.get_pixel(pos_x + 1, pos_y + 2);
+        let _4 = img.get_pixel(pos_x, pos_y + 2);
+        let _5 = img.get_pixel(pos_x, pos_y + 1);
+
         output += &get_character(_0, _1, _2, _3, _4, _5);
 
         pos_x += 2;
-
     }
 
     return output;
 }
 
 // returns a ascii charater representing four corresponding pixels
-fn get_character(_0: Rgba<u8>, _1: Rgba<u8>, _2: Rgba<u8>, _3: Rgba<u8>, _4: Rgba<u8>, _5: Rgba<u8>) -> String {
-
+fn get_character(
+    _0: Rgba<u8>,
+    _1: Rgba<u8>,
+    _2: Rgba<u8>,
+    _3: Rgba<u8>,
+    _4: Rgba<u8>,
+    _5: Rgba<u8>,
+) -> String {
     let quad = (
         is_below_threshold(_0),
         is_below_threshold(_1),
@@ -75,7 +77,7 @@ fn get_character(_0: Rgba<u8>, _1: Rgba<u8>, _2: Rgba<u8>, _3: Rgba<u8>, _4: Rgb
         is_below_threshold(_3),
         is_below_threshold(_4),
         is_below_threshold(_5),
-        );
+    );
 
     let value = match quad {
         (0, 0, 0, 0, 0, 0) => " ",
@@ -102,7 +104,6 @@ fn get_character(_0: Rgba<u8>, _1: Rgba<u8>, _2: Rgba<u8>, _3: Rgba<u8>, _4: Rgb
         (0, 1, 0, 1, 0, 0) => "!",
         (0, 1, 0, 0, 1, 0) => "/",
         (0, 1, 0, 1, 1, 0) => "2",
-
 
         (0, 1, 1, 0, 0, 0) => "!",
         (0, 1, 1, 1, 0, 0) => "]",
@@ -159,7 +160,7 @@ fn get_character(_0: Rgba<u8>, _1: Rgba<u8>, _2: Rgba<u8>, _3: Rgba<u8>, _4: Rgb
         (1, 1, 1, 0, 1, 1) => "A",
         (1, 1, 1, 1, 1, 1) => "@",
 
-        _ => " "
+        _ => " ",
     };
 
     return String::from(value);
@@ -168,12 +169,13 @@ fn get_character(_0: Rgba<u8>, _1: Rgba<u8>, _2: Rgba<u8>, _3: Rgba<u8>, _4: Rgb
 fn is_below_threshold(color: Rgba<u8>) -> u8 {
     // do not consider pixel if it is transparent
     if color.data[3] == 0 {
-        return 1
+        return 1;
     }
 
     if color.data[0] < GREY_SCALE_THRESHOLD
         && color.data[1] < GREY_SCALE_THRESHOLD
-        && color.data[2] < GREY_SCALE_THRESHOLD {
+        && color.data[2] < GREY_SCALE_THRESHOLD
+    {
         0
     } else {
         1
