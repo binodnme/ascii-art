@@ -3,10 +3,10 @@ extern crate image;
 use image::imageops::FilterType;
 use image::{GenericImageView, Rgba};
 
-// grey scale threshold value for black white algorithm
+/// grey scale threshold value algorithm
 const GREY_SCALE_THRESHOLD: u8 = 200;
 
-//uses black and white algorithm
+/// returns the ascii-art as String
 pub fn get_output(image_path: String) -> String {
     let mut img = image::open(image_path).unwrap();
 

@@ -1,6 +1,6 @@
 extern crate image;
 
-use dots::alg::greyscale;
+use ascii_art::alg::greyscale;
 use std::env;
 
 fn main() {
