@@ -1,23 +1,3 @@
-//   ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..  ..
-//   ..  ..  ..  ..  .@  .@  .@  .@  @.  @.  @.  @.  @@  @@  @@  @@
-//   ..  .@  @.  @@  ..  .@  @.  @@  ..  .@  @.  @@  ..  .@  @.  @@
-//       ,   .   _   -   i   v   g   -   c   i   s   =   e   z   m
-
-//   .@  .@  .@  .@  .@  .@  .@  .@  .@  .@  .@  .@  .@  .@  .@  .@
-//   ..  ..  ..  ..  .@  .@  .@  .@  @.  @.  @.  @.  @@  @@  @@  @@
-//   ..  .@  @.  @@  ..  .@  @.  @@  ..  .@  @.  @@  ..  .@  @.  @@
-//   '   !   /   2   !   ]   /   d   /   (   /   K   Y   4   Z   W
-
-//   @.  @.  @.  @.  @.  @.  @.  @.  @.  @.  @.  @.  @.  @.  @.  @.
-//   ..  ..  ..  ..  .@  .@  .@  .@  @.  @.  @.  @.  @@  @@  @@  @@
-//   ..  .@  @.  @@  ..  .@  @.  @@  ..  .@  @.  @@  ..  .@  @.  @@
-//   `   \   |   L   \   \   )   G   !   t   [   b   +   N   D   W
-
-//   @@  @@  @@  @@  @@  @@  @@  @@  @@  @@  @@  @@  @@  @@  @@  @@
-//   ..  ..  ..  ..  .@  .@  .@  .@  @.  @.  @.  @.  @@  @@  @@  @@
-//   ..  .@  @.  @@  ..  .@  @.  @@  ..  .@  @.  @@  ..  .@  @.  @@
-//   ~   T   7   X   V   Y   Z   8   f   5   P   K   *   M   A   @
-
 extern crate image;
 
 use image::imageops::FilterType;
@@ -61,7 +41,7 @@ pub fn get_output(image_path: String) -> String {
     return output;
 }
 
-// returns a ascii charater representing four corresponding pixels
+//returns a ascii charater representing four corresponding pixels
 fn get_character(
     _0: Rgba<u8>,
     _1: Rgba<u8>,
