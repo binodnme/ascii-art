@@ -6,11 +6,40 @@ use image::{GenericImageView, Rgba};
 /// grey scale threshold value algorithm
 const GREY_SCALE_THRESHOLD: u8 = 200;
 
+/// color invert option
+const INVERT_COLOR: bool = true;
+
+///Block contains the 6 adjacent pixels
+/// (x,y), (x + 1, y)
+/// (x, y + 1), (x +1 , y + 1)
+/// (x, y + 2), (x + 1, y + 2)
+struct PixelBlock {
+    x_y: Rgba<u8>,
+    x_1_y: Rgba<u8>,
+    x_1_y_1: Rgba<u8>,
+    x_1_y_2: Rgba<u8>,
+    x_y_2: Rgba<u8>,
+    x_y_1: Rgba<u8>,
+}
+
+///Block contains the threshold flag of 6 adjacent pixels
+/// (x,y), (x + 1, y)
+/// (x, y + 1), (x +1 , y + 1)
+/// (x, y + 2), (x + 1, y + 2)
+struct BlockThresholdFlag {
+    x_y: u8,
+    x_1_y: u8,
+    x_1_y_1: u8,
+    x_1_y_2: u8,
+    x_y_2: u8,
+    x_y_1: u8,
+}
+
 /// returns the ascii-art as String
 pub fn get_output(image_path: String) -> String {
     let mut img = image::open(image_path).unwrap();
 
-    img = img.resize(250, 250, FilterType::Triangle);
+    // img = img.resize(100, 100, FilterType::Triangle);
     let mut output = String::new();
 
     let (width, height) = img.dimensions();
@@ -25,15 +54,24 @@ pub fn get_output(image_path: String) -> String {
             output += "\n"
         }
 
-        //take 4 adjacent pixels at a time
-        let _0 = img.get_pixel(pos_x, pos_y);
-        let _1 = img.get_pixel(pos_x + 1, pos_y);
-        let _2 = img.get_pixel(pos_x + 1, pos_y + 1);
-        let _3 = img.get_pixel(pos_x + 1, pos_y + 2);
-        let _4 = img.get_pixel(pos_x, pos_y + 2);
-        let _5 = img.get_pixel(pos_x, pos_y + 1);
+        //take 6 adjacent pixels at a time
+        let x_y = img.get_pixel(pos_x, pos_y);
+        let x_1_y = img.get_pixel(pos_x + 1, pos_y);
+        let x_1_y_1 = img.get_pixel(pos_x + 1, pos_y + 1);
+        let x_1_y_2 = img.get_pixel(pos_x + 1, pos_y + 2);
+        let x_y_2 = img.get_pixel(pos_x, pos_y + 2);
+        let x_y_1 = img.get_pixel(pos_x, pos_y + 1);
 
-        output += &get_character(_0, _1, _2, _3, _4, _5);
+        let pb = PixelBlock {
+            x_y: x_y,
+            x_1_y: x_1_y,
+            x_1_y_1: x_1_y_1,
+            x_1_y_2: x_1_y_2,
+            x_y_2: x_y_2,
+            x_y_1: x_y_1,
+        };
+
+        output += &get_character(pb, INVERT_COLOR);
 
         pos_x += 2;
     }
@@ -42,24 +80,23 @@ pub fn get_output(image_path: String) -> String {
 }
 
 //returns a ascii charater representing four corresponding pixels
-fn get_character(
-    _0: Rgba<u8>,
-    _1: Rgba<u8>,
-    _2: Rgba<u8>,
-    _3: Rgba<u8>,
-    _4: Rgba<u8>,
-    _5: Rgba<u8>,
-) -> String {
-    let quad = (
-        is_below_threshold(_0),
-        is_below_threshold(_1),
-        is_below_threshold(_2),
-        is_below_threshold(_3),
-        is_below_threshold(_4),
-        is_below_threshold(_5),
-    );
+fn get_character(pb: PixelBlock, invert_color: bool) -> String {
+    let mut block = BlockThresholdFlag {
+        x_y: is_below_threshold(pb.x_y),
+        x_1_y: is_below_threshold(pb.x_1_y),
+        x_1_y_1: is_below_threshold(pb.x_1_y_1),
+        x_1_y_2: is_below_threshold(pb.x_1_y_2),
+        x_y_2: is_below_threshold(pb.x_y_2),
+        x_y_1: is_below_threshold(pb.x_y_1),
+    };
 
-    let value = match quad {
+    if invert_color {
+        block = invert_block_threshold_value(block);
+    }
+
+    let tuple_value = (block.x_y, block.x_1_y, block.x_1_y_1, block.x_1_y_2, block.x_y_2, block.x_y_1);
+
+    let value = match tuple_value {
         (0, 0, 0, 0, 0, 0) => " ",
         (0, 0, 0, 1, 0, 0) => ",",
         (0, 0, 0, 0, 1, 0) => ".",
@@ -147,17 +184,36 @@ fn get_character(
 }
 
 fn is_below_threshold(color: Rgba<u8>) -> u8 {
-    // do not consider pixel if it is transparent
-    if color.data[3] == 0 {
-        return 1;
+    let (r, g, b, alpha) = (color.data[0], color.data[1], color.data[2], color.data[3]);
+
+    let output;
+    if alpha == 0 {
+        output = 0;
+    }else if r < GREY_SCALE_THRESHOLD && g < GREY_SCALE_THRESHOLD && b < GREY_SCALE_THRESHOLD {
+        output = 1;
+    } else {
+        output = 0;
     }
 
-    if color.data[0] < GREY_SCALE_THRESHOLD
-        && color.data[1] < GREY_SCALE_THRESHOLD
-        && color.data[2] < GREY_SCALE_THRESHOLD
-    {
-        0
-    } else {
-        1
-    }
+    output
+}
+
+fn invert_block_threshold_value(mut block: BlockThresholdFlag) -> BlockThresholdFlag {
+    block.x_y = if block.x_y == 0 {1} else {0};
+    block.x_1_y = if block.x_1_y == 0 {1} else {0};
+    block.x_1_y_1 = if block.x_1_y_1 == 0 {1} else {0};
+    block.x_1_y_2 = if block.x_1_y_2 == 0 {1} else {0};
+    block.x_y_1 = if block.x_y_1 == 0 {1} else {0};
+    block.x_y_2 = if block.x_y_2 == 0 {1} else {0};
+    block
+}
+
+#[cfg(test)]
+#[test]
+fn should_be_below_threshold() {
+    let color: Rgba<u8> = Rgba {
+        data: [20, 20, 20, 255],
+    };
+
+    assert_eq!(is_below_threshold(color), 0)
 }
