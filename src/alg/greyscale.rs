@@ -37,7 +37,7 @@ struct BlockThresholdFlag {
 
 /// returns the ascii-art as String
 pub fn get_output(image_path: String) -> String {
-    let mut img = image::open(image_path).unwrap();
+    let img = image::open(image_path).unwrap();
 
     // img = img.resize(100, 100, FilterType::Triangle);
     let mut output = String::new();
@@ -215,5 +215,5 @@ fn should_be_below_threshold() {
         data: [20, 20, 20, 255],
     };
 
-    assert_eq!(is_below_threshold(color), 0)
+    assert_eq!(is_below_threshold(color), 1)
 }
