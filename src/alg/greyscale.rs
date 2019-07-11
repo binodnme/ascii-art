@@ -1,6 +1,5 @@
 extern crate image;
 
-use image::imageops::FilterType;
 use image::{GenericImageView, Rgba};
 
 /// grey scale threshold value algorithm
@@ -36,17 +35,16 @@ struct BlockThresholdFlag {
 }
 
 /// returns the ascii-art as String
-pub fn get_output(image_path: String) -> String {
+pub fn get_output(image_path: &str) -> String {
     let img = image::open(image_path).unwrap();
 
     // img = img.resize(100, 100, FilterType::Triangle);
-    let mut output = String::new();
-
+    
     let (width, height) = img.dimensions();
-
+    let mut output = String::new();
     let mut pos_x = 0;
     let mut pos_y = 0;
-
+    // TODO: remove magic number
     while pos_y < height - 5 {
         if pos_x >= width - 5 {
             pos_x = 0;
@@ -71,7 +69,7 @@ pub fn get_output(image_path: String) -> String {
             x_y_1: x_y_1,
         };
 
-        output += &get_character(pb, INVERT_COLOR);
+        output.push_str(&get_character(&pb, INVERT_COLOR));
 
         pos_x += 2;
     }
@@ -80,7 +78,7 @@ pub fn get_output(image_path: String) -> String {
 }
 
 //returns a ascii charater representing four corresponding pixels
-fn get_character(pb: PixelBlock, invert_color: bool) -> String {
+fn get_character(pb: &PixelBlock, invert_color: bool) -> String {
     let mut block = BlockThresholdFlag {
         x_y: is_below_threshold(pb.x_y),
         x_1_y: is_below_threshold(pb.x_1_y),
@@ -91,7 +89,7 @@ fn get_character(pb: PixelBlock, invert_color: bool) -> String {
     };
 
     if invert_color {
-        block = invert_block_threshold_value(block);
+        invert_block_threshold_value(&mut block);
     }
 
     let tuple_value = (block.x_y, block.x_1_y, block.x_1_y_1, block.x_1_y_2, block.x_y_2, block.x_y_1);
@@ -198,14 +196,13 @@ fn is_below_threshold(color: Rgba<u8>) -> u8 {
     output
 }
 
-fn invert_block_threshold_value(mut block: BlockThresholdFlag) -> BlockThresholdFlag {
+fn invert_block_threshold_value(block: &mut BlockThresholdFlag) {
     block.x_y = if block.x_y == 0 {1} else {0};
     block.x_1_y = if block.x_1_y == 0 {1} else {0};
     block.x_1_y_1 = if block.x_1_y_1 == 0 {1} else {0};
     block.x_1_y_2 = if block.x_1_y_2 == 0 {1} else {0};
     block.x_y_1 = if block.x_y_1 == 0 {1} else {0};
     block.x_y_2 = if block.x_y_2 == 0 {1} else {0};
-    block
 }
 
 #[cfg(test)]

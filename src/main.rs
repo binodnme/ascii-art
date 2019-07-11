@@ -12,5 +12,5 @@ fn main() {
         filepath = &args[1];
     }
 
-    println!("{}", greyscale(filepath.to_string()))
+    println!("{}", greyscale(&filepath.to_string()))
 }
