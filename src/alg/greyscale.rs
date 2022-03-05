@@ -1,9 +1,10 @@
 extern crate image;
 
 use image::{GenericImageView, Rgba};
+use image::imageops::FilterType;
 
 /// grey scale threshold value algorithm
-const GREY_SCALE_THRESHOLD: u8 = 200;
+const GREY_SCALE_THRESHOLD: u8 = 100;
 
 /// color invert option
 const INVERT_COLOR: bool = true;
@@ -35,21 +36,24 @@ struct BlockThresholdFlag {
 }
 
 /// returns the ascii-art as String
-pub fn get_output(image_path: &str) -> String {
-    let img = image::open(image_path).unwrap();
+pub fn convert_image_to_ascii(image_path: &str) -> Vec<String> {
+    let mut img = image::open(image_path).unwrap();
 
-    // img = img.resize(100, 100, FilterType::Triangle);
-    
+    img = img.resize(800, 500, FilterType::Triangle);
     let (width, height) = img.dimensions();
-    let mut output = String::new();
+    let mut result: Vec<String> = vec![];
     let mut pos_x = 0;
     let mut pos_y = 0;
     // TODO: remove magic number
+    let mut output = String::new();
     while pos_y < height - 5 {
+
         if pos_x >= width - 5 {
             pos_x = 0;
             pos_y += 3;
-            output += "\n"
+            // output += "\n"
+            result.push(output);
+            output = "".to_string();
         }
 
         //take 6 adjacent pixels at a time
@@ -61,20 +65,21 @@ pub fn get_output(image_path: &str) -> String {
         let x_y_1 = img.get_pixel(pos_x, pos_y + 1);
 
         let pb = PixelBlock {
-            x_y: x_y,
-            x_1_y: x_1_y,
-            x_1_y_1: x_1_y_1,
-            x_1_y_2: x_1_y_2,
-            x_y_2: x_y_2,
-            x_y_1: x_y_1,
+            x_y,
+            x_1_y,
+            x_1_y_1,
+            x_1_y_2,
+            x_y_2,
+            x_y_1,
         };
 
+        // result.append(&get_character(&pb, INVERT_COLOR));
         output.push_str(&get_character(&pb, INVERT_COLOR));
 
         pos_x += 2;
     }
 
-    return output;
+    return result;
 }
 
 //returns a ascii charater representing four corresponding pixels
@@ -92,7 +97,14 @@ fn get_character(pb: &PixelBlock, invert_color: bool) -> String {
         invert_block_threshold_value(&mut block);
     }
 
-    let tuple_value = (block.x_y, block.x_1_y, block.x_1_y_1, block.x_1_y_2, block.x_y_2, block.x_y_1);
+    let tuple_value = (
+        block.x_y,
+        block.x_1_y,
+        block.x_1_y_1,
+        block.x_1_y_2,
+        block.x_y_2,
+        block.x_y_1,
+    );
 
     let value = match tuple_value {
         (0, 0, 0, 0, 0, 0) => " ",
@@ -182,12 +194,12 @@ fn get_character(pb: &PixelBlock, invert_color: bool) -> String {
 }
 
 fn is_below_threshold(color: Rgba<u8>) -> u8 {
-    let (r, g, b, alpha) = (color.data[0], color.data[1], color.data[2], color.data[3]);
+    let (r, g, b, alpha) = (color.0[0], color.0[1], color.0[2], color.0[3]);
 
     let output;
     if alpha == 0 {
         output = 0;
-    }else if r < GREY_SCALE_THRESHOLD && g < GREY_SCALE_THRESHOLD && b < GREY_SCALE_THRESHOLD {
+    } else if r < GREY_SCALE_THRESHOLD && g < GREY_SCALE_THRESHOLD && b < GREY_SCALE_THRESHOLD {
         output = 1;
     } else {
         output = 0;
@@ -197,19 +209,19 @@ fn is_below_threshold(color: Rgba<u8>) -> u8 {
 }
 
 fn invert_block_threshold_value(block: &mut BlockThresholdFlag) {
-    block.x_y = if block.x_y == 0 {1} else {0};
-    block.x_1_y = if block.x_1_y == 0 {1} else {0};
-    block.x_1_y_1 = if block.x_1_y_1 == 0 {1} else {0};
-    block.x_1_y_2 = if block.x_1_y_2 == 0 {1} else {0};
-    block.x_y_1 = if block.x_y_1 == 0 {1} else {0};
-    block.x_y_2 = if block.x_y_2 == 0 {1} else {0};
+    block.x_y = if block.x_y == 0 { 1 } else { 0 };
+    block.x_1_y = if block.x_1_y == 0 { 1 } else { 0 };
+    block.x_1_y_1 = if block.x_1_y_1 == 0 { 1 } else { 0 };
+    block.x_1_y_2 = if block.x_1_y_2 == 0 { 1 } else { 0 };
+    block.x_y_1 = if block.x_y_1 == 0 { 1 } else { 0 };
+    block.x_y_2 = if block.x_y_2 == 0 { 1 } else { 0 };
 }
 
 #[cfg(test)]
 #[test]
 fn should_be_below_threshold() {
     let color: Rgba<u8> = Rgba {
-        data: [20, 20, 20, 255],
+        0: [20, 20, 20, 255],
     };
 
     assert_eq!(is_below_threshold(color), 1)
