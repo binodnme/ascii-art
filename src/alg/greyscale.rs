@@ -1,10 +1,10 @@
 extern crate image;
 
-use image::{GenericImageView, Rgba};
+use image::{DynamicImage, GenericImageView, Rgba, RgbImage};
 use image::imageops::FilterType;
 
 /// grey scale threshold value algorithm
-const GREY_SCALE_THRESHOLD: u8 = 100;
+const GREY_SCALE_THRESHOLD: u8 = 75;
 
 /// color invert option
 const INVERT_COLOR: bool = true;
@@ -35,11 +35,18 @@ struct BlockThresholdFlag {
     x_y_1: u8,
 }
 
-/// returns the ascii-art as String
 pub fn convert_image_to_ascii(image_path: &str) -> Vec<String> {
-    let mut img = image::open(image_path).unwrap();
+    let img = image::open(image_path).unwrap();
+    convert_rgb_image_to_ascii(&img.to_rgb8())
+}
 
-    img = img.resize(800, 500, FilterType::Triangle);
+/// returns the ascii-art as String
+pub fn convert_rgb_image_to_ascii(img: &RgbImage) -> Vec<String> {
+    let buffer = img.clone();
+    let mut img = DynamicImage::ImageRgb8(buffer);
+
+    img = img.resize(400, 250, FilterType::Triangle);
+
     let (width, height) = img.dimensions();
     let mut result: Vec<String> = vec![];
     let mut pos_x = 0;
@@ -47,7 +54,6 @@ pub fn convert_image_to_ascii(image_path: &str) -> Vec<String> {
     // TODO: remove magic number
     let mut output = String::new();
     while pos_y < height - 5 {
-
         if pos_x >= width - 5 {
             pos_x = 0;
             pos_y += 3;

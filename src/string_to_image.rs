@@ -1,8 +1,8 @@
-use image::{ImageBuffer, Rgba, RgbaImage};
+use image::{ImageBuffer, Rgb, RgbImage};
 use imageproc::drawing::draw_text_mut;
 use rusttype::{Font, Scale};
 
-pub fn string_to_image(text: Vec<String>) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
+pub fn ascii_to_image(text: &Vec<String>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     let font = Vec::from(include_bytes!("UbuntuMono-R.ttf") as &[u8]);
     let font = Font::try_from_vec(font).unwrap();
 
@@ -15,12 +15,10 @@ pub fn string_to_image(text: Vec<String>) -> ImageBuffer<Rgba<u8>, Vec<u8>> {
     let buffer_width = (char_height as u32) * 3 * (text.get(0).unwrap().len() as u32) / 2;
     let buffer_height = (char_height as u32) * 2 * (text.len() as u32);
 
-    println!("{} {}", text.get(0).unwrap().len(), text.len());
-    println!("{} {}", buffer_width, buffer_height);
-    let mut image_buffer = RgbaImage::new(buffer_width, buffer_height);
+    let mut image_buffer = RgbImage::new(buffer_width, buffer_height);
 
-    let color: Rgba<u8> = Rgba {
-        0: [255, 255, 255, 255],
+    let color: Rgb<u8> = Rgb {
+        0: [255, 255, 255],
     };
 
     for (i, line) in text.iter().enumerate() {
