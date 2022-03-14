@@ -1,7 +1,7 @@
 extern crate image;
 
-use image::{DynamicImage, GenericImageView, Rgba, RgbImage};
 use image::imageops::FilterType;
+use image::{DynamicImage, GenericImageView, RgbImage, Rgba};
 
 /// grey scale threshold value algorithm
 const GREY_SCALE_THRESHOLD: u8 = 75;

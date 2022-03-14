@@ -17,12 +17,19 @@ pub fn ascii_to_image(text: &Vec<String>) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
 
     let mut image_buffer = RgbImage::new(buffer_width, buffer_height);
 
-    let color: Rgb<u8> = Rgb {
-        0: [255, 255, 255],
-    };
+    let color: Rgb<u8> = Rgb { 0: [255, 255, 255] };
 
+    println!("starting to draw......");
     for (i, line) in text.iter().enumerate() {
-        draw_text_mut(&mut image_buffer, color, 0, (i * 12) as u32, scale, &font, line);
+        draw_text_mut(
+            &mut image_buffer,
+            color,
+            0,
+            (i * 12) as u32,
+            scale,
+            &font,
+            line,
+        );
     }
 
     image_buffer
