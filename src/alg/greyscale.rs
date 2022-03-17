@@ -1,8 +1,16 @@
 extern crate image;
 
+use crate::Buffer;
+use image::error::UnsupportedErrorKind::Format;
 use image::imageops::FilterType;
-use image::{DynamicImage, GenericImageView, RgbImage, Rgba};
+use image::{buffer, DynamicImage, GenericImageView, ImageBuffer, ImageFormat, RgbImage, Rgba};
+use web_sys::console::log;
 
+macro_rules! log {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
 /// grey scale threshold value algorithm
 const GREY_SCALE_THRESHOLD: u8 = 75;
 
@@ -36,12 +44,31 @@ struct BlockThresholdFlag {
 }
 
 pub fn convert_image_to_ascii(image_path: &str) -> Vec<String> {
-    let img = image::open(image_path).unwrap();
+    log!("converting rgb image to ascii 1");
+    log!("{}", &image_path);
+    let img = image::open("/home/kaala/projects/ascii-art/img_2.png").unwrap();
+    log!("image successfully opened..");
+    convert_rgb_image_to_ascii(&img.to_rgb8())
+}
+
+pub fn convert_image_buffer_to_ascii(bytes: &[u8]) -> Vec<String> {
+    println!("converting rgb image to ascii 1");
+    log!("converting rgb image to ascii 1");
+    let img = match image::load_from_memory(bytes) {
+        Ok(img) => img,
+        Err(error) => {
+            panic!("{:?}", error)
+        }
+    };
+
+    // let img = image::open("/home/kaala/projects/ascii-art/img_2.png").unwrap();
+    log!("image successfully opened..");
     convert_rgb_image_to_ascii(&img.to_rgb8())
 }
 
 /// returns the ascii-art as String
 pub fn convert_rgb_image_to_ascii(img: &RgbImage) -> Vec<String> {
+    // log!("converting rgb image to ascii 2");
     let buffer = img.clone();
     let mut img = DynamicImage::ImageRgb8(buffer);
 
