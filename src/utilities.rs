@@ -8,7 +8,7 @@ use image::codecs::gif::{GifDecoder, GifEncoder};
 use image::gif::Repeat;
 use image::{AnimationDecoder, DynamicImage, Frame, ImageBuffer, Rgb};
 
-use crate::alg::{convert_image_buffer_to_ascii, convert_image_to_ascii};
+use crate::alg::{convert_bytes_to_ascii, convert_image_to_ascii};
 use crate::string_to_image::ascii_to_image;
 
 macro_rules! log {
@@ -17,14 +17,14 @@ macro_rules! log {
     }
 }
 
-pub fn convert_image_to_ascii_image_1(bytes: &[u8]) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
+pub fn convert_image_to_ascii_image(bytes: &[u8]) -> ImageBuffer<Rgb<u8>, Vec<u8>> {
     log!("converting image to ascii");
     println!("converting image to ascii");
-    let ascii_art_text = convert_image_buffer_to_ascii(bytes);
+    let ascii_art_text = convert_bytes_to_ascii(bytes);
     ascii_to_image(&ascii_art_text)
 }
 
-pub fn convert_image_to_ascii_image(path: &String) {
+pub fn convert_image_to_ascii_image_1(path: &String) {
     println!("converting image to ascii");
     let ascii_art_text = convert_image_to_ascii(path);
     println!("converting ascii to image");

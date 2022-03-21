@@ -5,8 +5,6 @@ let imageInput = document.getElementById("input");
 let imageOutput = document.getElementById("output");
 
 
-
-
 fileInput.addEventListener('change', (e) => {
     console.log(e)
     let files = fileInput.files;
@@ -17,17 +15,21 @@ fileInput.addEventListener('change', (e) => {
     // debugger;
     fileReader.onload = function (event1) {
 
-        let input = new Uint8Array(this.result);
-        var inputBlob = new Blob([input], { type: "image/png" });
-        var inputImageUrl = URL.createObjectURL(inputBlob);
-        console.log('input image url ', inputImageUrl)
+        let input = new Uint8Array(event1.target.result);
+        let inputBlob = new Blob([input]);
+        let inputImageUrl = URL.createObjectURL(inputBlob);
 
         imageInput.src = inputImageUrl;
 
-        let output = wasm.create_ascii_art(input);
-        var outputBlob = new Blob([output]);
-        var outputImageUrl = URL.createObjectURL(outputBlob);
-        imageOutput.src = outputImageUrl;
+        try {
+            let output = wasm.create_ascii_art(input);
+            let outputBlob = new Blob([output]);
+            let outputImageUrl = URL.createObjectURL(outputBlob);
+            imageOutput.src = outputImageUrl;
+        } catch (e) {
+
+            console.log(e)
+        }
     }
     fileReader.readAsArrayBuffer(file);
 

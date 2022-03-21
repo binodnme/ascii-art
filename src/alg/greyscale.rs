@@ -1,6 +1,5 @@
 extern crate image;
 
-use crate::Buffer;
 use image::error::UnsupportedErrorKind::Format;
 use image::imageops::FilterType;
 use image::{buffer, DynamicImage, GenericImageView, ImageBuffer, ImageFormat, RgbImage, Rgba};
@@ -51,17 +50,17 @@ pub fn convert_image_to_ascii(image_path: &str) -> Vec<String> {
     convert_rgb_image_to_ascii(&img.to_rgb8())
 }
 
-pub fn convert_image_buffer_to_ascii(bytes: &[u8]) -> Vec<String> {
-    println!("converting rgb image to ascii 1");
-    log!("converting rgb image to ascii 1");
+pub fn convert_bytes_to_ascii(bytes: &[u8]) -> Vec<String> {
+    println!("converting rgb image to ascii");
+    log!("converting rgb image to ascii");
     let img = match image::load_from_memory(bytes) {
         Ok(img) => img,
         Err(error) => {
+            log!("error while loading file from memory");
             panic!("{:?}", error)
         }
     };
 
-    // let img = image::open("/home/kaala/projects/ascii-art/img_2.png").unwrap();
     log!("image successfully opened..");
     convert_rgb_image_to_ascii(&img.to_rgb8())
 }
