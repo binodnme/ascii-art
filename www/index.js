@@ -14,7 +14,6 @@ fileInput.addEventListener('change', (e) => {
 
     // debugger;
     fileReader.onload = function (event1) {
-
         let input = new Uint8Array(event1.target.result);
         let inputBlob = new Blob([input]);
         let inputImageUrl = URL.createObjectURL(inputBlob);
@@ -22,12 +21,20 @@ fileInput.addEventListener('change', (e) => {
         imageInput.src = inputImageUrl;
 
         try {
-            let output = wasm.create_ascii_art(input);
+            let extension = file.name.split('.').slice(-1)[0]
+            let output = ''
+            if (extension === 'png') {
+                output = wasm.create_ascii_art_from_png(input);
+            } else if (extension === 'gif') {
+                output = wasm.create_ascii_art_from_gif(input);
+            } else {
+                console.log('file format not supported')
+                return
+            }
             let outputBlob = new Blob([output]);
             let outputImageUrl = URL.createObjectURL(outputBlob);
             imageOutput.src = outputImageUrl;
         } catch (e) {
-
             console.log(e)
         }
     }
