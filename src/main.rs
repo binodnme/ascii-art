@@ -1,10 +1,10 @@
 extern crate image;
 
-use ascii_art::utilities::{convert_image_to_ascii_image, convert_image_to_ascii_image_1};
+
 use std::env;
-use std::io::{Cursor, Read};
-use image::{DynamicImage, GenericImageView, ImageFormat};
-use image::io::Reader;
+
+use image::{GenericImageView, ImageFormat};
+
 // use crate::utils1::
 
 fn main() {

@@ -1,9 +1,7 @@
 extern crate image;
 
-use image::error::UnsupportedErrorKind::Format;
 use image::imageops::FilterType;
-use image::{buffer, DynamicImage, GenericImageView, ImageBuffer, ImageFormat, RgbImage, Rgba};
-use web_sys::console::log;
+use image::{DynamicImage, GenericImageView, RgbImage, Rgba};
 
 macro_rules! log {
     ( $( $t:tt )* ) => {
@@ -11,6 +9,7 @@ macro_rules! log {
     }
 }
 /// grey scale threshold value algorithm
+/// min 0, max 255
 const GREY_SCALE_THRESHOLD: u8 = 75;
 
 /// color invert option
@@ -40,14 +39,6 @@ struct BlockThresholdFlag {
     x_1_y_2: u8,
     x_y_2: u8,
     x_y_1: u8,
-}
-
-pub fn convert_image_to_ascii(image_path: &str) -> Vec<String> {
-    log!("converting rgb image to ascii 1");
-    log!("{}", &image_path);
-    let img = image::open("/home/kaala/projects/ascii-art/img_2.png").unwrap();
-    log!("image successfully opened..");
-    convert_rgb_image_to_ascii(&img.to_rgb8())
 }
 
 pub fn convert_bytes_to_ascii(bytes: &[u8]) -> Vec<String> {
